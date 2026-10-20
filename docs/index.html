@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Cazador de Chollos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f0;--surface:#ffffff;--ink:#16201f;--muted:#5a6866;--line:#d6dddb;
+  --accent:#23439a;--accent-soft:#e3e9f8;--brass:#a87a1f;--brass-soft:#f6ecd4;
+  --good:#1f7a4d;--good-soft:#dff2e7;--warn:#9a5a00;--warn-soft:#fbead0;--bad:#a3322a;--bad-soft:#f8e0dd;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#101615;--surface:#18201f;--ink:#e6ecea;--muted:#9aa8a5;--line:#2b3735;
+  --accent:#8aa6ff;--accent-soft:#1f2a47;--brass:#e0b45a;--brass-soft:#3a2e14;
+  --good:#6fd29f;--good-soft:#173528;--warn:#f0b35a;--warn-soft:#3a2a10;--bad:#f08a80;--bad-soft:#3d1c19;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;padding-top:env(safe-area-inset-top,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{padding-block:24px 14px}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,4.5vw,2.6rem);letter-spacing:-.02em;margin:0}
+.tag{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);letter-spacing:.04em}
+.when{margin:8px 0 0;color:var(--muted);font-size:.95rem;display:flex;flex-wrap:wrap;gap:4px 18px}
+.when strong{color:var(--ink)}
+.aviso{margin-top:12px;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:.92rem}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+.tabs button{all:unset;cursor:pointer;font-family:var(--f-display);font-weight:700;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding-block:10px}
+.grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:999px;background:var(--surface);overflow:hidden}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;font-size:.88rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface);font-weight:600}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select,input[type=number]{font:inherit;font-size:.9rem;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);max-width:100%}
+input[type=number]{width:84px;font-family:var(--f-mono)}
+.summary{display:flex;flex-wrap:wrap;gap:6px 20px;padding-block:14px 4px;color:var(--muted);font-size:.92rem}
+.summary strong{color:var(--ink);font-family:var(--f-mono);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding-block:10px 24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.card.hot{border-color:color-mix(in srgb,var(--brass) 60%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--brass) 35%,transparent)}
+.foto{display:block;aspect-ratio:4/3;background:var(--line);position:relative;overflow:hidden}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.foto .chips{position:absolute;left:10px;top:10px;right:10px}
+.body{padding:12px 16px 0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:.72rem;font-weight:700;letter-spacing:.03em;padding:3px 8px;border-radius:999px;background:var(--surface);color:var(--accent);white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.chip.deal{background:var(--brass);color:#fff}
+.chip.new{background:var(--accent);color:var(--surface)}
+.chip.ok{color:var(--good)}
+.chip.fix{color:var(--warn)}
+.chip.of{color:var(--brass)}
+.title{font-family:var(--f-display);font-weight:700;font-size:1.02rem;line-height:1.25;margin:0;overflow-wrap:anywhere}
+.specs{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 10px}
+.why{margin:8px 16px 0;padding:8px 10px;border-radius:8px;background:var(--brass-soft);color:var(--brass);font-size:.86rem;font-weight:600;list-style:none;display:flex;flex-direction:column;gap:3px}
+.price{margin:12px 16px 0;border-top:1px dashed var(--line);padding-top:10px;display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:.88rem;font-variant-numeric:tabular-nums}
+.price span:nth-child(even){font-family:var(--f-mono);text-align:right}
+.price .muted{color:var(--muted)}
+.price .tot{font-weight:700;font-size:1.02rem;padding-top:6px;border-top:1px solid var(--line);margin-top:4px}
+.vs{margin:8px 16px 0;font-size:.84rem;color:var(--muted)}
+.vs b{color:var(--good)}
+.foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 16px}
+.time{font-size:.84rem;color:var(--muted)}
+.time.soon{color:var(--bad);font-weight:700}
+.btn{text-decoration:none;font-weight:700;font-size:.88rem;padding:8px 14px;border-radius:9px;background:var(--accent);color:var(--surface);white-space:nowrap}
+.more{display:block;margin:0 auto 40px;font:inherit;font-weight:700;padding:10px 20px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 10px}
+.noche{margin-top:10px;padding:16px;border-radius:16px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.noche h2{font-family:var(--f-display);font-weight:800;font-size:1.25rem;margin:0;color:var(--accent)}
+.noche p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.noche .grid{padding-block:14px 0}
+.resto-h{font-family:var(--f-display);font-weight:700;font-size:1.1rem;margin:22px 0 0}
+.nota{color:var(--muted);font-size:.82rem;padding-block:0 40px;max-width:70ch}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="brand"><h1>Cazador de Chollos</h1><span class="tag">eBAY · TODO EL MUNDO · PRECIO FINAL A ESPAÑA</span></div>
+  <p class="when" id="when">Cargando…</p>
+  <div class="aviso" id="aviso" hidden></div>
+  <div class="tabs" id="tabs" role="tablist" hidden></div>
+</header>
+
+<div class="bar"><div class="wrap">
+  <div class="grp"><span class="lbl">Estado</span>
+    <div class="seg" data-f="estado"><button data-v="todos">Todos</button><button data-v="Funciona">Funcionan</button><button data-v="Para reparar">Para reparar</button></div></div>
+  <div class="grp"><span class="lbl">Venta</span>
+    <div class="seg" data-f="formato"><button data-v="todos">Todas</button><button data-v="Subasta">Subasta</button><button data-v="Cómpralo ya">Cómpralo ya</button><button data-v="ofertas">Acepta ofertas</button></div></div>
+  <div class="grp"><label class="lbl" for="marca">Marca</label><select id="marca"><option value="todas">Todas</option></select></div>
+  <div class="grp"><label class="lbl" for="orden">Ordenar</label>
+    <select id="orden">
+      <option value="chollo">Mejor chollo</option><option value="nuevo">Nuevos primero</option>
+      <option value="publicado">Recién publicados</option><option value="tiempo">Termina antes</option>
+      <option value="pujas">Menos pujas</option><option value="total">Precio: más barato</option>
+      <option value="caro">Precio: más caro</option><option value="antiguos">Más antiguos primero</option>
+    </select></div>
+  <div class="grp"><label class="lbl" for="max">Máximo €</label><input id="max" type="number" min="10" step="10"></div>
+</div></div>
+
+<main class="wrap">
+  <div class="summary" id="summary"></div>
+  <section class="noche" id="noche" hidden>
+    <h2>Terminan esta noche</h2>
+    <p>Subastas que acaban antes de las 24:00. Todavía puedes pujar.</p>
+    <div class="grid" id="grid-noche"></div>
+  </section>
+  <h2 class="resto-h" id="resto-h" hidden>El resto</h2>
+  <div class="grid" id="grid"></div>
+  <button class="more" id="more" hidden>Ver más</button>
+  <p class="nota">El precio final incluye envío a España. Si el vendedor está fuera de la UE se suman IVA (21 %), arancel si pasa de 150 € y unos 5 € de gestión de aduana: son estimaciones. El «precio habitual» es la mediana de los anuncios de esa marca que el buscador ha visto en eBay; en las subastas solo se compara cuando faltan menos de 12 horas, porque antes el precio todavía sube.</p>
+</main>
+
+<script>
+const TZ="Europe/Madrid";
+const eur=n=>n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtFecha=d=>d.toLocaleString("es-ES",{timeZone:TZ,weekday:"long",day:"numeric",hour:"2-digit",minute:"2-digit"});
+let DATA=null, actual=null, mostrar=60;
+const defecto={estado:"todos",formato:"todos",marca:"todas",orden:"chollo",max:null};
+let st={...defecto};
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+// Próxima búsqueda según el horario (hora de España)
+function proxima(){
+  const ahora=new Date();
+  for(let h=1;h<=24*8;h++){
+    const d=new Date(ahora.getTime()+h*3600e3);
+    const p=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{timeZone:TZ,weekday:"short",hour:"2-digit",hourCycle:"h23"}).formatToParts(d).map(x=>[x.type,x.value]));
+    const finde=p.weekday==="Sat"||p.weekday==="Sun", hora=+p.hour;
+    if(finde?[6,10,14,18,22].includes(hora):[8,17].includes(hora)){d.setMinutes(0,0,0);return d;}
+  }
+}
+
+function horasHasta(iso){return iso?(new Date(iso)-Date.now())/36e5:null}
+function tiempo(it){
+  if(it.formato!=="Subasta"){const h=horasHasta(it.fin);return h&&h<48?`Termina en ${Math.max(1,Math.round(h))} h`:"Cómpralo ya";}
+  const h=horasHasta(it.fin);if(h==null)return"";
+  if(h<1)return`Termina en ${Math.max(1,Math.round(h*60))} min`;
+  if(h<24)return`Termina en ${Math.round(h)} h`;
+  const d=Math.round(h/24);return`Quedan ${d} día${d>1?"s":""}`;
+}
+function haceTxt(iso){if(!iso)return"";const h=(Date.now()-new Date(iso))/36e5;if(h<1)return"Publicado hace menos de 1 h";if(h<48)return`Publicado hace ${Math.round(h)} h`;return`Publicado hace ${Math.round(h/24)} días`;}
+function antesDeMedianoche(iso){
+  if(!iso)return false;const fin=new Date(iso),ahora=new Date();if(fin<=ahora)return false;
+  const dia=x=>x.toLocaleDateString("es-ES",{timeZone:TZ});return dia(fin)===dia(ahora);
+}
+
+function card(x){
+  const hot=x.chollo;
+  const chips=[x.nuevo?`<span class="chip new">NUEVO</span>`:"",hot?`<span class="chip deal">CHOLLO</span>`:"",
+    `<span class="chip ${x.estado==="Funciona"?"ok":"fix"}">${esc(x.estado)}</span>`,`<span class="chip">${esc(x.formato)}</span>`,
+    x.ofertas?`<span class="chip of">Acepta ofertas</span>`:""].join("");
+  const specs=[x.movimiento,x.rubies?`${x.rubies} rubíes`:"",x.decada?`Años ${String(x.decada).slice(2)}`:"",
+    `${x.pais_nombre}${x.ue?"":" · fuera UE"}`,x.mercado,haceTxt(x.publicado)].filter(Boolean).map(s=>`<span>${esc(s)}</span>`).join("");
+  const imp=x.ue?`<span class="muted">Impuestos</span><span>incluidos (UE)</span>`:
+    `${x.arancel?`<span class="muted">Arancel (est.)</span><span>${eur(x.arancel)}</span>`:""}<span class="muted">IVA importación 21 % (est.)</span><span>${eur(x.iva)}</span><span class="muted">Gestión aduana (est.)</span><span>${eur(x.gestion)}</span>`;
+  const h=horasHasta(x.fin);
+  return `<article class="card${hot?" hot":""}">
+   <a class="foto" href="${esc(x.url)}" target="_blank" rel="noopener">${x.foto?`<img src="${esc(x.foto)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}<div class="chips">${chips}</div></a>
+   <div class="body"><h2 class="title">${esc(x.titulo)}</h2><div class="specs">${specs}</div></div>
+   ${x.motivos&&x.motivos.length?`<ul class="why">${x.motivos.map(m=>`<li>${esc(m)}</li>`).join("")}</ul>`:""}
+   <div class="price">
+    <span class="muted">${x.formato==="Subasta"?`Puja actual (${x.pujas||0} puja${x.pujas===1?"":"s"})`:x.ofertas?"Precio (puedes ofrecer menos)":"Precio"}</span><span>${eur(x.precio)}</span>
+    <span class="muted">Envío desde ${esc(x.pais_nombre)}${x.envio_estimado?" (est.)":""}</span><span>${eur(x.envio)}</span>
+    ${imp}
+    <span class="tot">Precio final</span><span class="tot">${eur(x.total)}</span>
+   </div>
+   ${x.habitual?`<p class="vs">Habitual para ${esc(x.marca)}: ${eur(x.habitual)}${x.desc>0?` · <b>${x.desc} % más barato</b>`:""}</p>`:""}
+   <div class="foot"><span class="time${h!=null&&h<=6&&x.formato==="Subasta"?" soon":""}">${tiempo(x)}</span><a class="btn" href="${esc(x.url)}" target="_blank" rel="noopener">Ver en eBay</a></div>
+  </article>`;
+}
+
+function syncControles(){
+  document.querySelectorAll(".seg").forEach(seg=>seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st[seg.dataset.f]))));
+  document.getElementById("orden").value=st.orden;
+  document.getElementById("max").value=st.max;
+  const marcas=[...new Set(actual.items.map(x=>x.marca))].sort((a,b)=>a.localeCompare(b,"es"));
+  const sel=document.getElementById("marca");
+  sel.innerHTML=`<option value="todas">Todas</option>`+marcas.map(m=>`<option>${esc(m)}</option>`).join("");
+  sel.value=marcas.includes(st.marca)?st.marca:"todas";
+}
+
+function render(){
+  const ahora=Date.now();
+  const vivos=actual.items.filter(x=>!x.fin||new Date(x.fin)>ahora);
+  const porPrecio=vivos.filter(x=>x.total<=st.max);
+  let list=porPrecio.filter(x=>(st.estado==="todos"||x.estado===st.estado)
+    &&(st.formato==="todos"||(st.formato==="ofertas"?x.ofertas:x.formato===st.formato))
+    &&(st.marca==="todas"||x.marca===st.marca));
+  const S={
+    chollo:(a,b)=>(b.chollo-a.chollo)||(b.motivos.length-a.motivos.length)||((b.desc??-999)-(a.desc??-999)),
+    nuevo:(a,b)=>(b.nuevo-a.nuevo)||(b.chollo-a.chollo)||((b.desc??-999)-(a.desc??-999)),
+    publicado:(a,b)=>new Date(b.publicado||0)-new Date(a.publicado||0),
+    tiempo:(a,b)=>new Date(a.fin||"2999")-new Date(b.fin||"2999"),
+    pujas:(a,b)=>(a.formato==="Subasta"?a.pujas:1e9)-(b.formato==="Subasta"?b.pujas:1e9)||new Date(a.fin)-new Date(b.fin),
+    total:(a,b)=>a.total-b.total, caro:(a,b)=>b.total-a.total,
+    antiguos:(a,b)=>(a.decada||9999)-(b.decada||9999)
+  };
+  list.sort(S[st.orden]||S.chollo);
+  const nuevos=list.filter(x=>x.nuevo).length, chollos=list.filter(x=>x.chollo).length;
+  document.getElementById("summary").innerHTML=
+   `<span><strong>${list.length}</strong> anuncios</span><span><strong>${chollos}</strong> chollos</span><span><strong>${nuevos}</strong> nuevos desde la búsqueda anterior</span><span><strong>${vivos.length-porPrecio.length}</strong> por encima de ${eur(st.max)}</span>`;
+  const noche=list.filter(x=>x.formato==="Subasta"&&antesDeMedianoche(x.fin)).sort(S.tiempo);
+  const resto=list.filter(x=>!noche.includes(x));
+  const nocheEl=document.getElementById("noche");
+  nocheEl.hidden=!noche.length;
+  document.getElementById("grid-noche").innerHTML=noche.map(card).join("");
+  document.getElementById("resto-h").hidden=!(noche.length&&resto.length);
+  const g=document.getElementById("grid");
+  g.innerHTML=list.length?resto.slice(0,mostrar).map(card).join(""):`<p class="empty">Ningún anuncio cumple estos filtros. Prueba a subir el precio máximo o a quitar algún filtro.</p>`;
+  const more=document.getElementById("more");
+  more.hidden=resto.length<=mostrar;
+  more.textContent=`Ver más (${resto.length-mostrar} restantes)`;
+}
+
+function elegir(id){
+  actual=DATA.busquedas.find(b=>b.id===id)||DATA.busquedas[0];
+  lsSet("cc-tab",actual.id);
+  st={...defecto,max:actual.precio_max,...(lsGet("cc-f-"+actual.id)||{})};
+  mostrar=60;
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.id===actual.id)));
+  syncControles();render();
+}
+function guardar(){lsSet("cc-f-"+actual.id,st);mostrar=60;render();}
+
+document.querySelectorAll(".seg").forEach(seg=>seg.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{st[seg.dataset.f]=b.dataset.v;syncControlesSeg();guardar();})));
+function syncControlesSeg(){document.querySelectorAll(".seg").forEach(seg=>seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st[seg.dataset.f]))));}
+document.getElementById("orden").addEventListener("change",e=>{st.orden=e.target.value;guardar();});
+document.getElementById("marca").addEventListener("change",e=>{st.marca=e.target.value;guardar();});
+document.getElementById("max").addEventListener("input",e=>{const v=parseFloat(e.target.value);if(v>0){st.max=v;guardar();}});
+document.getElementById("more").addEventListener("click",()=>{mostrar+=60;render();});
+
+fetch("datos.json?t="+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{
+  DATA=d;
+  const p=proxima();
+  document.getElementById("when").innerHTML=`<span>Última búsqueda: <strong>${esc(fmtFecha(new Date(d.actualizado)))}</strong></span>${p?`<span>Próxima: ${esc(fmtFecha(p))}</span>`:""}`;
+  if(d.avisos&&d.avisos.length){const a=document.getElementById("aviso");a.textContent=d.avisos.join(" ");a.hidden=false;}
+  const tabs=document.getElementById("tabs");
+  tabs.innerHTML=d.busquedas.map(b=>`<button role="tab" data-id="${esc(b.id)}">${esc(b.nombre)}</button>`).join("");
+  tabs.hidden=d.busquedas.length<2;
+  tabs.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>elegir(b.dataset.id)));
+  elegir(lsGet("cc-tab"));
+}).catch(()=>{
+  document.getElementById("when").textContent="Todavía no se ha hecho ninguna búsqueda. En cuanto se ejecute la primera, aparecerán aquí los anuncios.";
+  document.querySelector(".bar").hidden=true;
+});
+</script>
+</body>
+</html>

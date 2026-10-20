@@ -1,0 +1,64 @@
+name: Buscar chollos
+
+# Horario de España: lunes a viernes 8:00 y 17:00; sábado y domingo 6, 10, 14, 18 y 22 h.
+# GitHub usa hora UTC, por eso hay una línea para invierno y otra para verano (horario.py elige).
+on:
+  schedule:
+    - cron: "0 7,16 * * 1-5"          # L-V invierno
+    - cron: "0 6,15 * * 1-5"          # L-V verano
+    - cron: "0 5,9,13,17,21 * * 0,6"  # finde invierno
+    - cron: "0 4,8,12,16,20 * * 0,6"  # finde verano
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: buscar
+  cancel-in-progress: false
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.publicar.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: ¿Toca buscar ahora?
+        id: hora
+        run: python3 horario.py
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+
+      - name: Buscar en eBay
+        if: steps.hora.outputs.toca == 'si'
+        run: python3 buscador.py
+        env:
+          EBAY_APP_ID: ${{ secrets.EBAY_APP_ID }}
+          EBAY_CERT_ID: ${{ secrets.EBAY_CERT_ID }}
+
+      - name: Guardar resultados
+        if: steps.hora.outputs.toca == 'si'
+        run: |
+          git config user.name "cazador-chollos[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/datos.json datos/historial.json
+          git diff --cached --quiet || git commit -m "Búsqueda $(TZ=Europe/Madrid date '+%d/%m %H:%M')"
+          git push
+
+      - uses: actions/configure-pages@v5
+        if: steps.hora.outputs.toca == 'si'
+
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.hora.outputs.toca == 'si'
+        with:
+          path: docs
+
+      - id: publicar
+        if: steps.hora.outputs.toca == 'si'
+        uses: actions/deploy-pages@v4
