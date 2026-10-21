@@ -20,7 +20,6 @@
       "arancel": 0.045,
       "consultas": [
         "reloj cuerda manual vintage",
-        "reloj automatico vintage",
         "reloj sovietico",
         "Handaufzug Armbanduhr",
         "mechanische Armbanduhr vintage",
@@ -40,7 +39,12 @@
         "omgea",
         "longins",
         "tisot",
-        "polyot"
+        "polyot",
+        "reloj de cuerda antiguo",
+        "reloj carga manual",
+        "Handaufzug Uhr",
+        "remontage manuel montre",
+        "manual wind watch vintage"
       ],
       "excluir": [
         "quartz",
@@ -134,7 +138,6 @@
         "mechanisms",
         "mecanismos",
         "watchbox",
-        "uhrenbox",
         "estuche de reloj",
         "aufzugwelle",
         "winding stem",
@@ -151,7 +154,22 @@
         "warranty card",
         "papers only",
         "nos part",
-        "new old stock part"
+        "new old stock part",
+        "automatic",
+        "automatico",
+        "automático",
+        "automatique",
+        "automatik",
+        "automatica",
+        "automática",
+        "autowind",
+        "self-winding",
+        "self winding",
+        "selfwinding",
+        "selbstaufzug",
+        "automat",
+        "автоподзавод",
+        "автоматический"
       ],
       "marcas": {
         "Poljot": [
