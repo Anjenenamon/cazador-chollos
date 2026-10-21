@@ -244,6 +244,8 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
             break
 
     mujer = bool(pats.get("mujer") and pats["mujer"].search(t))
+    if mujer and b.get("solo_hombre"):
+        return None
     reparar = str(raw.get("conditionId", "")) == "7000" or bool(pats["reparar"] and pats["reparar"].search(t))
 
     m = RUBIES.search(t)

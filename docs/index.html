@@ -101,7 +101,7 @@ input[type=number]{width:84px;font-family:var(--f-mono)}
     <div class="seg" data-f="estado"><button data-v="todos">Todos</button><button data-v="Funciona">Funcionan</button><button data-v="Para reparar">Para reparar</button></div></div>
   <div class="grp"><span class="lbl">Venta</span>
     <div class="seg" data-f="formato"><button data-v="todos">Todas</button><button data-v="Subasta">Subasta</button><button data-v="Cómpralo ya">Cómpralo ya</button><button data-v="ofertas">Acepta ofertas</button></div></div>
-  <div class="grp"><span class="lbl">Para</span>
+  <div class="grp" id="grp-genero"><span class="lbl">Para</span>
     <div class="seg" data-f="genero"><button data-v="todos">Todos</button><button data-v="hombre">Hombre</button><button data-v="mujer">Mujer</button></div></div>
   <div class="grp"><label class="lbl" for="marca">Marca</label><select id="marca"><option value="todas">Todas</option></select></div>
   <div class="grp"><label class="lbl" for="orden">Ordenar</label>
@@ -196,6 +196,9 @@ function syncControles(){
   const sel=document.getElementById("marca");
   sel.innerHTML=`<option value="todas">Todas</option>`+marcas.map(m=>`<option>${esc(m)}</option>`).join("");
   sel.value=marcas.includes(st.marca)?st.marca:"todas";
+  const hayMujer=actual.items.some(x=>x.mujer);
+  document.getElementById("grp-genero").hidden=!hayMujer;
+  if(!hayMujer)st.genero="todos";
 }
 
 function render(){
