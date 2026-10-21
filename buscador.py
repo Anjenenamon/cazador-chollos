@@ -90,6 +90,12 @@ def http(url, cabeceras=None, datos=None, intentos=3):
                 time.sleep(3 * (n + 1))
                 continue
             raise RuntimeError(f"Sin conexión: {e.reason}") from None
+        except (TimeoutError, ConnectionError, OSError, ValueError) as e:
+            # eBay tarda en responder, corta la conexión o devuelve algo ilegible
+            if n < intentos - 1:
+                time.sleep(3 * (n + 1))
+                continue
+            raise RuntimeError(f"eBay no respondió bien: {type(e).__name__}") from None
 
 
 # ---------- eBay ----------
@@ -385,7 +391,12 @@ def main():
                         res = buscar(tok, mercado, consulta, categoria, tope, cfg, orden)
                     except RuntimeError as e:
                         if categoria and "categor" in str(e).lower():
-                            res = buscar(tok, mercado, consulta, None, tope, cfg, orden)
+                            try:
+                                res = buscar(tok, mercado, consulta, None, tope, cfg, orden)
+                            except RuntimeError as e2:
+                                errores += 1
+                                log(f"  Aviso {mercado} «{consulta}»: {e2}")
+                                continue
                         else:
                             errores += 1
                             log(f"  Aviso {mercado} «{consulta}»: {e}")
