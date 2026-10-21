@@ -43,7 +43,12 @@ TASAS_RESERVA = {"EUR": 1.0, "USD": 1.08, "GBP": 0.85}
 GESTION_ADUANA = 5.0
 ENVIO_SUPUESTO_UE = 10.0
 ENVIO_SUPUESTO_FUERA = 20.0
-UMBRAL_CHOLLO = 35
+UMBRAL_CHOLLO = 35          # % por debajo del habitual (Cómpralo ya)
+UMBRAL_SUBASTA = 50         # subastas: más exigente, porque aún pueden subir
+HORAS_SUBASTA = 3           # y solo si quedan pocas horas
+MIN_REFERENCIAS = 8         # anuncios mínimos para calcular el precio habitual
+PERCENTIL_CHOLLO = 10       # además debe estar entre el 10 % más barato de su marca
+MARGEN_SALIDA = 1.25        # en la página se guardan anuncios hasta 1,25 × el precio máximo
 DIAS_HISTORIAL = 60
 
 
@@ -188,6 +193,8 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
     t = " " + titulo.lower() + " "
     if pats["excluir"] and pats["excluir"].search(t):
         return None
+    if pats.get("inicio") and pats["inicio"].match(titulo.lower().strip()):
+        return None
 
     opciones = raw.get("buyingOptions", [])
     subasta = "AUCTION" in opciones
@@ -230,6 +237,7 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
             errata = (mal, bien)
             break
 
+    mujer = bool(pats.get("mujer") and pats["mujer"].search(t))
     reparar = str(raw.get("conditionId", "")) == "7000" or bool(pats["reparar"] and pats["reparar"].search(t))
 
     m = RUBIES.search(t)
@@ -244,6 +252,7 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
         "url": raw.get("itemWebUrl", ""),
         "foto": img,
         "marca": marca or "Otras",
+        "mujer": mujer,
         "errata": errata,
         "lote": lote,
         "mercado": DOMINIO.get(mercado, mercado),
@@ -263,7 +272,6 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
         "fin": raw.get("itemEndDate"),
         "publicado": raw.get("itemCreationDate"),
         "estado": "Para reparar" if reparar else "Funciona",
-        "condicion": raw.get("condition", ""),
         "decada": decada(t),
         "movimiento": movimiento(t),
         "rubies": int(m.group(1)) if m and 7 <= int(m.group(1)) <= 41 else None,
@@ -275,9 +283,18 @@ def horas_hasta(fin_iso, ref):
     return (f - ref).total_seconds() / 3600 if f else None
 
 
-def evaluar(it, habitual, ref):
-    """Añade precio habitual, % de descuento, si es chollo y los motivos."""
+def clave_ref(marca, mujer):
+    return f"{marca} (mujer)" if mujer else marca
+
+
+def evaluar(it, habitual, ref, barato=None):
+    """Añade precio habitual, % de descuento, si es chollo y los motivos.
+
+    habitual: mediana de precios de su marca. barato: precio por debajo del cual
+    está el 10 % más barato de su marca.
+    """
     motivos = []
+    entre_baratos = barato is not None and it["total"] <= barato
     it["habitual"] = round(habitual, 2) if habitual else None
     it["desc"] = None
     if habitual:
@@ -285,10 +302,14 @@ def evaluar(it, habitual, ref):
     h = horas_hasta(it["fin"], ref)
     es_subasta = it["formato"] == "Subasta"
     # En una subasta el precio sube; solo la comparamos con el habitual si queda poco.
-    comparable = (not es_subasta) or (h is not None and h <= 12)
-    chollo = bool(comparable and it["desc"] is not None and it["desc"] >= UMBRAL_CHOLLO)
+    if es_subasta:
+        chollo = bool(entre_baratos and h is not None and h <= HORAS_SUBASTA
+                      and it["desc"] is not None and it["desc"] >= UMBRAL_SUBASTA)
+    else:
+        chollo = bool(entre_baratos and it["desc"] is not None and it["desc"] >= UMBRAL_CHOLLO)
     if chollo:
-        motivos.append(f"{it['desc']} % por debajo de lo habitual para {it['marca']}")
+        quien = f"{it['marca']} de mujer" if it["mujer"] else it["marca"]
+        motivos.append(f"{it['desc']} % por debajo de lo habitual para {quien}")
     if es_subasta and h is not None and h <= 12 and (it["pujas"] or 0) <= 2:
         motivos.append(f"Subasta con {it['pujas'] or 0} puja{'s' if (it['pujas'] or 0) != 1 else ''} y termina en {max(1, round(h))} h")
     if it["errata"]:
@@ -347,6 +368,8 @@ def main():
             "excluir": patron(b.get("excluir", [])),
             "reparar": patron(b.get("palabras_reparar", [])),
             "lote": patron(b.get("palabras_lote", [])),
+            "mujer": patron(b.get("palabras_mujer", [])),
+            "inicio": patron(b.get("excluir_si_empieza", [])),
             "marcas": [(n, patron(alias)) for n, alias in b.get("marcas", {}).items()],
         }
         tope_eur = b["precio_max"] * 2  # guardamos hasta el doble para tener precios de referencia
@@ -382,20 +405,26 @@ def main():
             v = vistos.get(iid)
             it["nuevo"] = hubo_anterior and v is None
             vistos[iid] = {
-                "b": b["id"], "marca": it["marca"], "total": it["total"],
+                "b": b["id"], "marca": clave_ref(it["marca"], it["mujer"]), "total": it["total"],
                 "fijo": it["formato"] != "Subasta",
                 "primera": v["primera"] if v else iso(ref), "visto": iso(ref),
             }
-            it["visto_desde"] = vistos[iid]["primera"]
 
         # Precio habitual por marca: mediana de anuncios de precio fijo vistos (mín. 5).
         por_marca = {}
         for v in vistos.values():
             if v.get("b") == b["id"] and v.get("fijo") and v.get("marca") not in ("Otras", "Varios (lote)"):
                 por_marca.setdefault(v["marca"], []).append(v["total"])
-        habitual = {m: statistics.median(p) for m, p in por_marca.items() if len(p) >= 5}
+        habitual = {m: statistics.median(p) for m, p in por_marca.items() if len(p) >= MIN_REFERENCIAS}
+        barato = {m: statistics.quantiles(p, n=100)[PERCENTIL_CHOLLO - 1]
+                  for m, p in por_marca.items() if len(p) >= MIN_REFERENCIAS}
 
-        lista = [evaluar(it, habitual.get(it["marca"]), ref) for it in items.values()]
+        tope_salida = b["precio_max"] * MARGEN_SALIDA
+        lista = []
+        for it in items.values():
+            if it["total"] <= tope_salida:
+                k = clave_ref(it["marca"], it["mujer"])
+                lista.append(evaluar(it, habitual.get(k), ref, barato.get(k)))
         lista.sort(key=lambda x: (not x["chollo"], -(x["desc"] or -999)))
         salida["busquedas"].append({
             "id": b["id"], "nombre": b["nombre"], "precio_max": b["precio_max"],

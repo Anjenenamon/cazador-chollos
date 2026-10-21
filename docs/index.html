@@ -84,6 +84,7 @@ input[type=number]{width:84px;font-family:var(--f-mono)}
 .noche p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
 .noche .grid{padding-block:14px 0}
 .resto-h{font-family:var(--f-display);font-weight:700;font-size:1.1rem;margin:22px 0 0}
+@media (max-width:700px){.bar{position:static;backdrop-filter:none}.bar .wrap{gap:8px 12px}}
 .nota{color:var(--muted);font-size:.82rem;padding-block:0 40px;max-width:70ch}
 </style>
 </head>
@@ -100,6 +101,8 @@ input[type=number]{width:84px;font-family:var(--f-mono)}
     <div class="seg" data-f="estado"><button data-v="todos">Todos</button><button data-v="Funciona">Funcionan</button><button data-v="Para reparar">Para reparar</button></div></div>
   <div class="grp"><span class="lbl">Venta</span>
     <div class="seg" data-f="formato"><button data-v="todos">Todas</button><button data-v="Subasta">Subasta</button><button data-v="Cómpralo ya">Cómpralo ya</button><button data-v="ofertas">Acepta ofertas</button></div></div>
+  <div class="grp"><span class="lbl">Para</span>
+    <div class="seg" data-f="genero"><button data-v="todos">Todos</button><button data-v="hombre">Hombre</button><button data-v="mujer">Mujer</button></div></div>
   <div class="grp"><label class="lbl" for="marca">Marca</label><select id="marca"><option value="todas">Todas</option></select></div>
   <div class="grp"><label class="lbl" for="orden">Ordenar</label>
     <select id="orden">
@@ -121,7 +124,7 @@ input[type=number]{width:84px;font-family:var(--f-mono)}
   <h2 class="resto-h" id="resto-h" hidden>El resto</h2>
   <div class="grid" id="grid"></div>
   <button class="more" id="more" hidden>Ver más</button>
-  <p class="nota">El precio final incluye envío a España. Si el vendedor está fuera de la UE se suman IVA (21 %), arancel si pasa de 150 € y unos 5 € de gestión de aduana: son estimaciones. El «precio habitual» es la mediana de los anuncios de esa marca que el buscador ha visto en eBay; en las subastas solo se compara cuando faltan menos de 12 horas, porque antes el precio todavía sube.</p>
+  <p class="nota">El precio final incluye envío a España. Si el vendedor está fuera de la UE se suman IVA (21 %), arancel si pasa de 150 € y unos 5 € de gestión de aduana: son estimaciones. El «precio habitual» es la mediana de los anuncios de esa marca (separando los de mujer) que el buscador ha visto en eBay. Un anuncio es CHOLLO si está al menos un 35 % por debajo de lo habitual y entre el 10 % más barato de su marca. En las subastas se exige un 50 % y que falten menos de 3 horas, porque antes el precio todavía sube.</p>
 </main>
 
 <script>
@@ -130,7 +133,7 @@ const eur=n=>n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDi
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtFecha=d=>d.toLocaleString("es-ES",{timeZone:TZ,weekday:"long",day:"numeric",hour:"2-digit",minute:"2-digit"});
 let DATA=null, actual=null, mostrar=60;
-const defecto={estado:"todos",formato:"todos",marca:"todas",orden:"chollo",max:null};
+const defecto={estado:"todos",formato:"todos",genero:"todos",marca:"todas",orden:"chollo",max:null};
 let st={...defecto};
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
@@ -164,7 +167,7 @@ function card(x){
   const hot=x.chollo;
   const chips=[x.nuevo?`<span class="chip new">NUEVO</span>`:"",hot?`<span class="chip deal">CHOLLO</span>`:"",
     `<span class="chip ${x.estado==="Funciona"?"ok":"fix"}">${esc(x.estado)}</span>`,`<span class="chip">${esc(x.formato)}</span>`,
-    x.ofertas?`<span class="chip of">Acepta ofertas</span>`:""].join("");
+    x.ofertas?`<span class="chip of">Acepta ofertas</span>`:"",x.mujer?`<span class="chip">Mujer</span>`:""].join("");
   const specs=[x.movimiento,x.rubies?`${x.rubies} rubíes`:"",x.decada?`Años ${String(x.decada).slice(2)}`:"",
     `${x.pais_nombre}${x.ue?"":" · fuera UE"}`,x.mercado,haceTxt(x.publicado)].filter(Boolean).map(s=>`<span>${esc(s)}</span>`).join("");
   const imp=x.ue?`<span class="muted">Impuestos</span><span>incluidos (UE)</span>`:
@@ -201,7 +204,8 @@ function render(){
   const porPrecio=vivos.filter(x=>x.total<=st.max);
   let list=porPrecio.filter(x=>(st.estado==="todos"||x.estado===st.estado)
     &&(st.formato==="todos"||(st.formato==="ofertas"?x.ofertas:x.formato===st.formato))
-    &&(st.marca==="todas"||x.marca===st.marca));
+    &&(st.marca==="todas"||x.marca===st.marca)
+    &&(st.genero==="todos"||(st.genero==="mujer")===!!x.mujer));
   const S={
     chollo:(a,b)=>(b.chollo-a.chollo)||(b.motivos.length-a.motivos.length)||((b.desc??-999)-(a.desc??-999)),
     nuevo:(a,b)=>(b.nuevo-a.nuevo)||(b.chollo-a.chollo)||((b.desc??-999)-(a.desc??-999)),

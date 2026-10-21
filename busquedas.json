@@ -1,6 +1,13 @@
 {
   "_ayuda": "Cada bloque de 'busquedas' es una pestaña de la página. Para añadir otra (por ejemplo Amstrad CPC 464) copia un bloque y cambia las palabras.",
-  "mercados": ["EBAY_ES", "EBAY_DE", "EBAY_FR", "EBAY_IT", "EBAY_GB", "EBAY_US"],
+  "mercados": [
+    "EBAY_ES",
+    "EBAY_DE",
+    "EBAY_FR",
+    "EBAY_IT",
+    "EBAY_GB",
+    "EBAY_US"
+  ],
   "pais_entrega": "ES",
   "codigo_postal": "28001",
   "busquedas": [
@@ -35,77 +42,398 @@
         "polyot"
       ],
       "excluir": [
-        "quartz", "quarz", "cuarzo", "quarzo", "kinetic", "solar", "smartwatch",
-        "digital", "lcd", "replica", "réplica", "homage", "hommage",
-        "strap only", "solo correa", "nur armband", "armband nur", "dial only", "solo esfera",
-        "box only", "solo caja", "uhrenbox", "watch box", "watch winder", "uhrenbeweger",
-        "pocket watch", "taschenuhr", "reloj de bolsillo", "montre de poche", "orologio da tasca",
-        "wall clock", "wanduhr", "alarm clock", "wecker", "despertador",
-        "movement only", "solo maquinaria", "werk only", "nur werk"
+        "quartz",
+        "quarz",
+        "cuarzo",
+        "quarzo",
+        "kinetic",
+        "solar",
+        "smartwatch",
+        "digital",
+        "lcd",
+        "replica",
+        "réplica",
+        "homage",
+        "hommage",
+        "strap only",
+        "solo correa",
+        "nur armband",
+        "armband nur",
+        "dial only",
+        "solo esfera",
+        "box only",
+        "solo caja",
+        "uhrenbox",
+        "watch box",
+        "watch winder",
+        "uhrenbeweger",
+        "pocket watch",
+        "taschenuhr",
+        "reloj de bolsillo",
+        "montre de poche",
+        "orologio da tasca",
+        "wall clock",
+        "wanduhr",
+        "alarm clock",
+        "wecker",
+        "despertador",
+        "movement only",
+        "solo maquinaria",
+        "werk only",
+        "nur werk",
+        "caja trasera",
+        "case back",
+        "caseback",
+        "tapa trasera",
+        "gehäuseboden",
+        "fondello",
+        "mecanismo de reloj",
+        "movimiento de reloj",
+        "maquinaria de reloj",
+        "watch movement",
+        "uhrwerk",
+        "mouvement de montre",
+        "movimento orologio",
+        "uhrband",
+        "watch strap",
+        "watch band",
+        "nato strap",
+        "correa de reloj",
+        "bracelet de montre",
+        "cinturino",
+        "corona de reloj",
+        "watch crown",
+        "cristal de reloj",
+        "watch crystal",
+        "watch glass",
+        "uhrglas",
+        "esfera de reloj",
+        "dial for",
+        "zifferblatt für",
+        "cadran de montre",
+        "quadrante per",
+        "bolsillo",
+        "pocket",
+        "tasca",
+        "poche",
+        "savonette",
+        "lepine",
+        "pendant watch",
+        "colgante",
+        "reloj de enfermera",
+        "nurse watch",
+        "repair tools",
+        "herramienta",
+        "werkzeug",
+        "watch tool",
+        "watch parts",
+        "piezas de reloj",
+        "uhrenteile",
+        "pièces détachées",
+        "mechanisms",
+        "mecanismos",
+        "watchbox",
+        "uhrenbox",
+        "estuche de reloj",
+        "aufzugwelle",
+        "winding stem",
+        "tija de reloj",
+        "unruh",
+        "balance complete",
+        "balance wheel",
+        "zeiger satz",
+        "watch hands",
+        "agujas de reloj",
+        "bedienungsanleitung",
+        "instruction manual",
+        "garantiekarte",
+        "warranty card",
+        "papers only",
+        "nos part",
+        "new old stock part"
       ],
       "marcas": {
-        "Poljot": ["poljot", "polyot", "poliot", "poljiot", "полёт", "полет"],
-        "Raketa": ["raketa", "ракета"],
-        "Vostok": ["vostok", "wostok", "komandirskie", "amphibia", "восток"],
-        "Slava": ["slava", "слава"],
-        "Pobeda": ["pobeda", "победа"],
-        "Sekonda": ["sekonda"],
-        "Luch": ["luch", "луч"],
-        "Chaika": ["chaika", "чайка"],
-        "Zim": ["zim ", "зим"],
-        "Molnija": ["molnija", "molnia", "молния"],
-        "Seiko": ["seiko", "seyko", "seico"],
-        "Citizen": ["citizen"],
-        "Orient": ["orient"],
-        "Omega": ["omega", "omgea", "omga"],
-        "Longines": ["longines", "longins", "longine "],
-        "Tissot": ["tissot", "tisot"],
-        "Zenith": ["zenith"],
-        "Certina": ["certina"],
-        "Doxa": ["doxa"],
-        "Oris": ["oris "],
-        "Eterna": ["eterna"],
-        "Enicar": ["enicar"],
-        "Cyma": ["cyma"],
-        "Universal Genève": ["universal geneve", "universal genève"],
-        "Bulova": ["bulova"],
-        "Hamilton": ["hamilton"],
-        "Timex": ["timex"],
-        "Junghans": ["junghans"],
-        "Kienzle": ["kienzle"],
-        "Ruhla": ["ruhla"],
-        "Glashütte": ["glashütte", "glashutte", "gub "],
-        "Lip": ["lip "],
-        "Dugena": ["dugena"],
-        "Roamer": ["roamer"],
-        "Mido": ["mido "],
-        "Rado": ["rado "],
-        "Fortis": ["fortis"],
-        "Edox": ["edox"],
-        "Lanco": ["lanco"],
-        "Titoni": ["titoni"],
-        "Zodiac": ["zodiac"],
-        "Movado": ["movado"],
-        "Heuer": ["heuer"],
-        "Festina": ["festina"],
-        "Duward": ["duward"],
-        "Radiant": ["radiant"],
-        "Cauny": ["cauny"]
+        "Poljot": [
+          "poljot",
+          "polyot",
+          "poliot",
+          "poljiot",
+          "полёт",
+          "полет"
+        ],
+        "Raketa": [
+          "raketa",
+          "ракета"
+        ],
+        "Vostok": [
+          "vostok",
+          "wostok",
+          "komandirskie",
+          "amphibia",
+          "восток"
+        ],
+        "Slava": [
+          "slava",
+          "слава"
+        ],
+        "Pobeda": [
+          "pobeda",
+          "победа"
+        ],
+        "Sekonda": [
+          "sekonda"
+        ],
+        "Luch": [
+          "luch",
+          "луч"
+        ],
+        "Chaika": [
+          "chaika",
+          "чайка"
+        ],
+        "Zim": [
+          "zim ",
+          "зим"
+        ],
+        "Molnija": [
+          "molnija",
+          "molnia",
+          "молния"
+        ],
+        "Seiko": [
+          "seiko",
+          "seyko",
+          "seico"
+        ],
+        "Citizen": [
+          "citizen"
+        ],
+        "Orient": [
+          "orient"
+        ],
+        "Omega": [
+          "omega",
+          "omgea",
+          "omga"
+        ],
+        "Longines": [
+          "longines",
+          "longins",
+          "longine "
+        ],
+        "Tissot": [
+          "tissot",
+          "tisot"
+        ],
+        "Zenith": [
+          "zenith"
+        ],
+        "Certina": [
+          "certina"
+        ],
+        "Doxa": [
+          "doxa"
+        ],
+        "Oris": [
+          "oris "
+        ],
+        "Eterna": [
+          "eterna"
+        ],
+        "Enicar": [
+          "enicar"
+        ],
+        "Cyma": [
+          "cyma"
+        ],
+        "Universal Genève": [
+          "universal geneve",
+          "universal genève"
+        ],
+        "Bulova": [
+          "bulova"
+        ],
+        "Hamilton": [
+          "hamilton"
+        ],
+        "Timex": [
+          "timex"
+        ],
+        "Junghans": [
+          "junghans"
+        ],
+        "Kienzle": [
+          "kienzle"
+        ],
+        "Ruhla": [
+          "ruhla"
+        ],
+        "Glashütte": [
+          "glashütte",
+          "glashutte",
+          "gub "
+        ],
+        "Lip": [
+          "lip "
+        ],
+        "Dugena": [
+          "dugena"
+        ],
+        "Roamer": [
+          "roamer"
+        ],
+        "Mido": [
+          "mido "
+        ],
+        "Rado": [
+          "rado "
+        ],
+        "Fortis": [
+          "fortis"
+        ],
+        "Edox": [
+          "edox"
+        ],
+        "Lanco": [
+          "lanco"
+        ],
+        "Titoni": [
+          "titoni"
+        ],
+        "Zodiac": [
+          "zodiac"
+        ],
+        "Movado": [
+          "movado"
+        ],
+        "Heuer": [
+          "heuer"
+        ],
+        "Festina": [
+          "festina"
+        ],
+        "Duward": [
+          "duward"
+        ],
+        "Radiant": [
+          "radiant"
+        ],
+        "Cauny": [
+          "cauny"
+        ]
       },
       "erratas": {
-        "seyko": "Seiko", "seico": "Seiko", "omgea": "Omega", "omga": "Omega",
-        "longins": "Longines", "tisot": "Tissot", "polyot": "Poljot", "poliot": "Poljot"
+        "seyko": "Seiko",
+        "seico": "Seiko",
+        "omgea": "Omega",
+        "omga": "Omega",
+        "longins": "Longines",
+        "tisot": "Tissot",
+        "polyot": "Poljot",
+        "poliot": "Poljot"
       },
       "palabras_reparar": [
-        "para reparar", "no funciona", "para piezas", "averiado",
-        "defekt", "bastler", "für teile", "fur teile", "ersatzteil",
-        "for parts", "not working", "spares or repair", "spares repair", "needs repair", "non working",
-        "pour pièces", "pour pieces", "ne fonctionne pas", "en panne", "hs ",
-        "non funziona", "per ricambi", "da riparare", "guasto"
+        "para reparar",
+        "no funciona",
+        "para piezas",
+        "averiado",
+        "defekt",
+        "bastler",
+        "für teile",
+        "fur teile",
+        "ersatzteil",
+        "for parts",
+        "not working",
+        "spares or repair",
+        "spares repair",
+        "needs repair",
+        "non working",
+        "pour pièces",
+        "pour pieces",
+        "ne fonctionne pas",
+        "en panne",
+        "hs ",
+        "non funziona",
+        "per ricambi",
+        "da riparare",
+        "guasto"
       ],
       "palabras_lote": [
-        "lote", "lot of", "job lot", "joblot", "bundle", "konvolut", "sammlung", "nachlass",
-        "del abuelo", "grandfather", "grandad", "lotto", "lotto di", "collection of"
+        "lote",
+        "lot of",
+        "job lot",
+        "joblot",
+        "bundle",
+        "konvolut",
+        "sammlung",
+        "nachlass",
+        "del abuelo",
+        "grandfather",
+        "grandad",
+        "lotto",
+        "lotto di",
+        "collection of"
+      ],
+      "palabras_mujer": [
+        "mujer",
+        "dama",
+        "señora",
+        "señoras",
+        "ladies",
+        "lady",
+        "women",
+        "womens",
+        "women's",
+        "woman",
+        "damen",
+        "damenuhr",
+        "femme",
+        "dame",
+        "donna",
+        "signora",
+        "girls"
+      ],
+      "excluir_si_empieza": [
+        "mecanismo",
+        "movimiento",
+        "maquinaria",
+        "mechanism",
+        "mechanisms",
+        "movement",
+        "movements",
+        "uhrwerk",
+        "mouvement",
+        "movimento",
+        "calibre",
+        "kaliber",
+        "caliber",
+        "parts",
+        "piezas",
+        "ersatzteile",
+        "pièces",
+        "ricambi",
+        "correa",
+        "strap",
+        "band",
+        "armband",
+        "caja",
+        "box",
+        "watchbox",
+        "estuche",
+        "etui",
+        "dokument",
+        "garantie",
+        "certificate",
+        "manual",
+        "bedienungsanleitung",
+        "papers",
+        "papeles",
+        "agujas",
+        "zeiger",
+        "hands",
+        "crown",
+        "corona",
+        "krone"
       ]
     }
   ]
