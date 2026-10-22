@@ -9,8 +9,8 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-INVIERNO = {"0 7,16 * * 1-5", "0 5,9,13,17,21 * * 0,6"}   # España = UTC+1
-VERANO = {"0 6,15 * * 1-5", "0 4,8,12,16,20 * * 0,6"}     # España = UTC+2
+INVIERNO = {"50 6,15 * * 1-5", "50 4,8,12,16,20 * * 0,6"}   # España = UTC+1
+VERANO = {"50 5,14 * * 1-5", "50 3,7,11,15,19 * * 0,6"}     # España = UTC+2
 
 prog = os.environ.get("SCHEDULE", "").strip()
 desfase = datetime.now(ZoneInfo("Europe/Madrid")).utcoffset().total_seconds() / 3600

@@ -2,12 +2,13 @@ name: Buscar chollos
 
 # Horario de España: lunes a viernes 8:00 y 17:00; sábado y domingo 6, 10, 14, 18 y 22 h.
 # GitHub usa hora UTC, por eso hay una línea para invierno y otra para verano (horario.py elige).
+# Se programan 10 minutos antes de la hora: a las horas en punto GitHub va saturado y retrasa.
 on:
   schedule:
-    - cron: "0 7,16 * * 1-5"          # L-V invierno
-    - cron: "0 6,15 * * 1-5"          # L-V verano
-    - cron: "0 5,9,13,17,21 * * 0,6"  # finde invierno
-    - cron: "0 4,8,12,16,20 * * 0,6"  # finde verano
+    - cron: "50 6,15 * * 1-5"          # L-V invierno
+    - cron: "50 5,14 * * 1-5"          # L-V verano
+    - cron: "50 4,8,12,16,20 * * 0,6"  # finde invierno
+    - cron: "50 3,7,11,15,19 * * 0,6"  # finde verano
   workflow_dispatch: {}
 
 permissions:
