@@ -37,9 +37,14 @@ PAISES = {
     "CY": "Chipre", "MT": "Malta", "LU": "Luxemburgo", "MX": "México", "BR": "Brasil", "AR": "Argentina",
 }
 DOMINIO = {"EBAY_ES": "ebay.es", "EBAY_DE": "ebay.de", "EBAY_FR": "ebay.fr", "EBAY_IT": "ebay.it",
-           "EBAY_GB": "ebay.co.uk", "EBAY_US": "ebay.com"}
-MONEDA = {"EBAY_GB": "GBP", "EBAY_US": "USD"}
-TASAS_RESERVA = {"EUR": 1.0, "USD": 1.08, "GBP": 0.85}
+           "EBAY_GB": "ebay.co.uk", "EBAY_US": "ebay.com", "EBAY_AT": "ebay.at", "EBAY_BE": "ebay.be",
+           "EBAY_CH": "ebay.ch", "EBAY_IE": "ebay.ie", "EBAY_NL": "ebay.nl", "EBAY_PL": "ebay.pl",
+           "EBAY_AU": "ebay.com.au", "EBAY_CA": "ebay.ca", "EBAY_HK": "ebay.com.hk", "EBAY_SG": "ebay.com.sg"}
+MONEDA = {"EBAY_GB": "GBP", "EBAY_US": "USD", "EBAY_CH": "CHF", "EBAY_PL": "PLN", "EBAY_AU": "AUD",
+          "EBAY_CA": "CAD", "EBAY_HK": "HKD", "EBAY_SG": "SGD"}
+TASAS_RESERVA = {"EUR": 1.0, "USD": 1.08, "GBP": 0.85, "CHF": 0.94, "PLN": 4.3, "AUD": 1.65,
+                 "CAD": 1.5, "HKD": 8.4, "SGD": 1.45}
+MAX_LLAMADAS = 900          # tope de seguridad por ronda (eBay permite 5.000 al día)
 GESTION_ADUANA = 5.0
 ENVIO_SUPUESTO_UE = 10.0
 ENVIO_SUPUESTO_FUERA = 20.0
@@ -113,11 +118,12 @@ def token(app_id, cert_id):
 
 
 def tasas_cambio():
-    for url in ("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP",
-                "https://api.frankfurter.app/latest?from=EUR&to=USD,GBP"):
+    simb = ",".join(k for k in TASAS_RESERVA if k != "EUR")
+    for url in (f"https://api.frankfurter.dev/v1/latest?base=EUR&symbols={simb}",
+                f"https://api.frankfurter.app/latest?from=EUR&to={simb}"):
         try:
             r = http(url, {"User-Agent": "cazador-chollos"}, intentos=2)
-            t = {"EUR": 1.0}
+            t = dict(TASAS_RESERVA)
             t.update({k: float(v) for k, v in r["rates"].items()})
             log("Tipos de cambio:", t)
             return t
@@ -403,11 +409,17 @@ def main():
         tope_eur = b["precio_max"] * 2  # guardamos hasta el doble para tener precios de referencia
         items = {}
         categoria = b.get("categoria")
-        for mercado in cfg["mercados"]:
+        principales = set(cfg["mercados"])
+        todos = cfg["mercados"] + [m for m in cfg.get("mercados_secundarios", []) if m not in principales]
+        for mercado in todos:
             moneda = MONEDA.get(mercado, "EUR")
             tope = tope_eur * tasas.get(moneda, 1.0)
+            # En los países secundarios, una sola pasada (los más nuevos) para no gastar el cupo diario
+            ordenes = ("newlyListed", "endingSoonest") if mercado in principales else ("newlyListed",)
             for consulta in b["consultas"]:
-                for orden in ("newlyListed", "endingSoonest"):
+                for orden in ordenes:
+                    if llamadas >= MAX_LLAMADAS:
+                        break
                     llamadas += 1
                     try:
                         res = buscar(tok, mercado, consulta, categoria, tope, cfg, orden)

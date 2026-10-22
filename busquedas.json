@@ -8,6 +8,18 @@
     "EBAY_GB",
     "EBAY_US"
   ],
+  "mercados_secundarios": [
+    "EBAY_AT",
+    "EBAY_BE",
+    "EBAY_CH",
+    "EBAY_IE",
+    "EBAY_NL",
+    "EBAY_PL",
+    "EBAY_AU",
+    "EBAY_CA",
+    "EBAY_HK",
+    "EBAY_SG"
+  ],
   "pais_entrega": "ES",
   "codigo_postal": "28001",
   "busquedas": [
