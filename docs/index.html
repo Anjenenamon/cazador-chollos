@@ -34,6 +34,10 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,4.5vw,2.6
 .tag{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);letter-spacing:.04em}
 .when{margin:8px 0 0;color:var(--muted);font-size:.95rem;display:flex;flex-wrap:wrap;gap:4px 18px}
 .when strong{color:var(--ink)}
+.when{align-items:center}
+.pill{font-weight:700;font-size:.85rem;padding:3px 10px;border-radius:999px}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
 .aviso{margin-top:12px;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:.92rem}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
 .tabs button{all:unset;cursor:pointer;font-family:var(--f-display);font-weight:700;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
@@ -139,6 +143,19 @@ const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
 // Próxima búsqueda según el horario (hora de España)
+function esHoraDeBusqueda(d){
+  const p=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{timeZone:TZ,weekday:"short",hour:"2-digit",hourCycle:"h23"}).formatToParts(d).map(x=>[x.type,x.value]));
+  const finde=p.weekday==="Sat"||p.weekday==="Sun", hora=+p.hour;
+  return finde?[6,10,14,18,22].includes(hora):[8,17].includes(hora);
+}
+// Última hora de búsqueda que ya debería haber pasado
+function anterior(){
+  const ahora=new Date();
+  for(let h=0;h<=24*8;h++){
+    const d=new Date(ahora.getTime()-h*3600e3);d.setMinutes(0,0,0);
+    if(d<=ahora&&esHoraDeBusqueda(d))return d;
+  }
+}
 function proxima(){
   const ahora=new Date();
   for(let h=1;h<=24*8;h++){
@@ -255,7 +272,12 @@ document.getElementById("more").addEventListener("click",()=>{mostrar+=60;render
 fetch("datos.json?t="+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{
   DATA=d;
   const p=proxima();
-  document.getElementById("when").innerHTML=`<span>Última búsqueda: <strong>${esc(fmtFecha(new Date(d.actualizado)))}</strong></span>${p?`<span>Próxima: ${esc(fmtFecha(p))}</span>`:""}`;
+  const ult=new Date(d.actualizado), tocaba=anterior();
+  // Se considera al día si la última búsqueda es posterior a la hora programada (con 15 min de margen)
+  const alDia=!tocaba||ult>=new Date(tocaba.getTime()-15*60e3);
+  const hhmm=x=>x.toLocaleTimeString("es-ES",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});
+  const estado=alDia?`<span class="pill ok">● Al día</span>`:`<span class="pill bad">● La búsqueda de las ${hhmm(tocaba)} aún no se ha hecho</span>`;
+  document.getElementById("when").innerHTML=`${estado}<span>Última búsqueda: <strong>${esc(fmtFecha(ult))}</strong></span>${p?`<span>Próxima: ${esc(fmtFecha(p))}</span>`:""}`;
   if(d.avisos&&d.avisos.length){const a=document.getElementById("aviso");a.textContent=d.avisos.join(" ");a.hidden=false;}
   const tabs=document.getElementById("tabs");
   tabs.innerHTML=d.busquedas.map(b=>`<button role="tab" data-id="${esc(b.id)}">${esc(b.nombre)}</button>`).join("");
