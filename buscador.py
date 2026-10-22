@@ -46,6 +46,7 @@ ENVIO_SUPUESTO_FUERA = 20.0
 UMBRAL_CHOLLO = 35          # % por debajo del habitual (Cómpralo ya)
 UMBRAL_SUBASTA = 50         # subastas: más exigente, porque aún pueden subir
 HORAS_SUBASTA = 3           # y solo si quedan pocas horas
+VERSION_REGLAS = 2          # súbelo si cambian las reglas de qué cuenta como reloj
 MIN_REFERENCIAS = 8         # anuncios mínimos para calcular el precio habitual
 PERCENTIL_CHOLLO = 10       # además debe estar entre el 10 % más barato de su marca
 MARGEN_SALIDA = 1.25        # en la página se guardan anuncios hasta 1,25 × el precio máximo
@@ -243,6 +244,16 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
             errata = (mal, bien)
             break
 
+    modelo = None
+    if marca and marca in pats.get("modelos", {}):
+        for nombre_m, rx in pats["modelos"][marca]:
+            if rx.search(t):
+                modelo = nombre_m
+                break
+    if marca and not modelo and pats.get("calibre"):
+        mc = pats["calibre"].search(t)
+        if mc:
+            modelo = f"cal. {mc.group(1)}"
     mujer = bool(pats.get("mujer") and pats["mujer"].search(t))
     if mujer and b.get("solo_hombre"):
         return None
@@ -260,6 +271,7 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
         "url": raw.get("itemWebUrl", ""),
         "foto": img,
         "marca": marca or "Otras",
+        "modelo": modelo,
         "mujer": mujer,
         "errata": errata,
         "lote": lote,
@@ -291,11 +303,17 @@ def horas_hasta(fin_iso, ref):
     return (f - ref).total_seconds() / 3600 if f else None
 
 
-def clave_ref(marca, mujer):
-    return f"{marca} (mujer)" if mujer else marca
+def clave_ref(marca, mujer, modelo=None):
+    k = f"{marca} {modelo}" if modelo else marca
+    return f"{k} (mujer)" if mujer else k
 
 
-def evaluar(it, habitual, ref, barato=None):
+def nombre_ref(it, con_modelo):
+    k = f"{it['marca']} {it['modelo']}" if con_modelo and it.get("modelo") else it["marca"]
+    return f"{k} de mujer" if it["mujer"] else k
+
+
+def evaluar(it, habitual, ref, barato=None, quien=None):
     """Añade precio habitual, % de descuento, si es chollo y los motivos.
 
     habitual: mediana de precios de su marca. barato: precio por debajo del cual
@@ -304,6 +322,7 @@ def evaluar(it, habitual, ref, barato=None):
     motivos = []
     entre_baratos = barato is not None and it["total"] <= barato
     it["habitual"] = round(habitual, 2) if habitual else None
+    it["ref_nombre"] = quien or it["marca"]
     it["desc"] = None
     if habitual:
         it["desc"] = round((1 - it["total"] / habitual) * 100)
@@ -316,8 +335,7 @@ def evaluar(it, habitual, ref, barato=None):
     else:
         chollo = bool(entre_baratos and it["desc"] is not None and it["desc"] >= UMBRAL_CHOLLO)
     if chollo:
-        quien = f"{it['marca']} de mujer" if it["mujer"] else it["marca"]
-        motivos.append(f"{it['desc']} % por debajo de lo habitual para {quien}")
+        motivos.append(f"{it['desc']} % por debajo de lo habitual para {it['ref_nombre']}")
     if es_subasta and h is not None and h <= 12 and (it["pujas"] or 0) <= 2:
         motivos.append(f"Subasta con {it['pujas'] or 0} puja{'s' if (it['pujas'] or 0) != 1 else ''} y termina en {max(1, round(h))} h")
     if it["errata"]:
@@ -379,6 +397,8 @@ def main():
             "mujer": patron(b.get("palabras_mujer", [])),
             "inicio": patron(b.get("excluir_si_empieza", [])),
             "marcas": [(n, patron(alias)) for n, alias in b.get("marcas", {}).items()],
+            "modelos": {m: [(n, patron(a)) for n, a in mods.items()] for m, mods in b.get("modelos", {}).items()},
+            "calibre": re.compile(b["calibre_regex"]) if b.get("calibre_regex") else None,
         }
         tope_eur = b["precio_max"] * 2  # guardamos hasta el doble para tener precios de referencia
         items = {}
@@ -419,15 +439,20 @@ def main():
             it["nuevo"] = hubo_anterior and v is None
             vistos[iid] = {
                 "b": b["id"], "marca": clave_ref(it["marca"], it["mujer"]), "total": it["total"],
-                "fijo": it["formato"] != "Subasta",
+                "modelo": clave_ref(it["marca"], it["mujer"], it["modelo"]) if it["modelo"] else None,
+                "fijo": it["formato"] != "Subasta", "v": VERSION_REGLAS,
                 "primera": v["primera"] if v else iso(ref), "visto": iso(ref),
             }
 
-        # Precio habitual por marca: mediana de anuncios de precio fijo vistos (mín. 5).
+        # Precio habitual: mediana de anuncios "Cómpralo ya" vistos, por modelo si hay bastantes
+        # y si no por marca. Solo cuentan anuncios analizados con las reglas actuales.
         por_marca = {}
         for v in vistos.values():
-            if v.get("b") == b["id"] and v.get("fijo") and v.get("marca") not in ("Otras", "Varios (lote)"):
+            if (v.get("b") == b["id"] and v.get("fijo") and v.get("v") == VERSION_REGLAS
+                    and v.get("marca") not in ("Otras", "Varios (lote)")):
                 por_marca.setdefault(v["marca"], []).append(v["total"])
+                if v.get("modelo"):
+                    por_marca.setdefault(v["modelo"], []).append(v["total"])
         habitual = {m: statistics.median(p) for m, p in por_marca.items() if len(p) >= MIN_REFERENCIAS}
         barato = {m: statistics.quantiles(p, n=100)[PERCENTIL_CHOLLO - 1]
                   for m, p in por_marca.items() if len(p) >= MIN_REFERENCIAS}
@@ -436,8 +461,10 @@ def main():
         lista = []
         for it in items.values():
             if it["total"] <= tope_salida:
-                k = clave_ref(it["marca"], it["mujer"])
-                lista.append(evaluar(it, habitual.get(k), ref, barato.get(k)))
+                km = clave_ref(it["marca"], it["mujer"], it["modelo"]) if it["modelo"] else None
+                con_modelo = km in habitual
+                k = km if con_modelo else clave_ref(it["marca"], it["mujer"])
+                lista.append(evaluar(it, habitual.get(k), ref, barato.get(k), nombre_ref(it, con_modelo)))
         lista.sort(key=lambda x: (not x["chollo"], -(x["desc"] or -999)))
         salida["busquedas"].append({
             "id": b["id"], "nombre": b["nombre"], "precio_max": b["precio_max"],

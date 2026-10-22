@@ -80,8 +80,6 @@
         "wall clock",
         "wanduhr",
         "alarm clock",
-        "wecker",
-        "despertador",
         "movement only",
         "solo maquinaria",
         "werk only",
@@ -169,7 +167,65 @@
         "selbstaufzug",
         "automat",
         "автоподзавод",
-        "автоматический"
+        "автоматический",
+        "wheel",
+        "wheels",
+        "minute wheel",
+        "escape wheel",
+        "third wheel",
+        "hour wheel",
+        "center wheel",
+        "crown wheel",
+        "ratchet wheel",
+        "rueda de reloj",
+        "ruedas",
+        "rad für",
+        "räder",
+        "roue",
+        "ruota",
+        "mainspring",
+        "muelle real",
+        "zugfeder",
+        "ressort de barillet",
+        "molla di carica",
+        "hairspring",
+        "spiral",
+        "balance staff",
+        "unruhwelle",
+        "setting lever",
+        "sperrklinke",
+        "cannon pinion",
+        "pinion",
+        "federhaus",
+        "barrel",
+        "tambour",
+        "bridge for",
+        "brücke",
+        "pont de",
+        "ponte",
+        "dials",
+        "zifferblätter",
+        "esferas",
+        "cadrans",
+        "quadranti",
+        "click spring",
+        "jewel bearing",
+        "detent",
+        "spare part",
+        "spare parts",
+        "repuesto",
+        "repuestos",
+        "ersatzteil",
+        "ersatzteile",
+        "pièce détachée",
+        "ricambio",
+        "reisewecker",
+        "tischuhr",
+        "tischwecker",
+        "despertador de mesa",
+        "travel alarm clock",
+        "réveil de voyage",
+        "sveglia da tavolo"
       ],
       "marcas": {
         "Poljot": [
@@ -464,8 +520,171 @@
         "hands",
         "crown",
         "corona",
-        "krone"
-      ]
+        "krone",
+        "dial",
+        "dials",
+        "esfera",
+        "zifferblatt",
+        "cadran",
+        "quadrante",
+        "wheel",
+        "rueda",
+        "nos ",
+        "new old stock"
+      ],
+      "calibre_regex": "(?<![\\d.,])(2[0-6]\\d{2}|3133|3017)(?!\\d)",
+      "modelos": {
+        "Poljot": {
+          "Sturmanskie": [
+            "sturmanskie",
+            "штурманские"
+          ],
+          "Kirovskie": [
+            "kirovskie",
+            "кировские"
+          ],
+          "Alarm": [
+            "alarm",
+            "signal",
+            "сигнал",
+            "wecker",
+            "despertador",
+            "réveil"
+          ],
+          "Strela": [
+            "strela",
+            "стрела"
+          ],
+          "Cronógrafo": [
+            "chronograph",
+            "cronógrafo",
+            "cronografo",
+            "chronographe",
+            "chrono"
+          ],
+          "De Luxe": [
+            "de luxe",
+            "deluxe",
+            "de-luxe"
+          ],
+          "Aviator": [
+            "aviator"
+          ]
+        },
+        "Raketa": {
+          "24 horas": [
+            "24 horas",
+            "24 hour",
+            "24 hours",
+            "24h",
+            "24 stunden",
+            "24 heures",
+            "24 ore"
+          ],
+          "Kopernik": [
+            "kopernik",
+            "copernicus"
+          ],
+          "Big Zero": [
+            "big zero"
+          ],
+          "Polar": [
+            "polar"
+          ]
+        },
+        "Vostok": {
+          "Komandirskie": [
+            "komandirskie",
+            "kommandirskie",
+            "komandirski",
+            "командирские"
+          ],
+          "Amphibia": [
+            "amphibia",
+            "amfibia",
+            "амфибия"
+          ],
+          "Precision": [
+            "precision",
+            "прецизионные"
+          ]
+        },
+        "Pobeda": {
+          "ZIM": [
+            "zim",
+            "зим"
+          ],
+          "Sturmanskie": [
+            "sturmanskie",
+            "штурманские"
+          ]
+        },
+        "Seiko": {
+          "Seiko 5": [
+            "seiko 5"
+          ],
+          "Sportsmatic": [
+            "sportsmatic"
+          ],
+          "Lord Marvel": [
+            "lord marvel"
+          ],
+          "Skyliner": [
+            "skyliner"
+          ],
+          "Cronos": [
+            "cronos"
+          ]
+        },
+        "Omega": {
+          "Seamaster": [
+            "seamaster"
+          ],
+          "De Ville": [
+            "de ville",
+            "deville"
+          ],
+          "Genève": [
+            "geneve",
+            "genève"
+          ],
+          "Constellation": [
+            "constellation"
+          ]
+        },
+        "Tissot": {
+          "Seastar": [
+            "seastar"
+          ],
+          "Visodate": [
+            "visodate"
+          ],
+          "Stylist": [
+            "stylist"
+          ]
+        },
+        "Longines": {
+          "Conquest": [
+            "conquest"
+          ],
+          "Flagship": [
+            "flagship"
+          ],
+          "Admiral": [
+            "admiral"
+          ]
+        },
+        "Hamilton": {
+          "Khaki": [
+            "khaki"
+          ]
+        },
+        "Timex": {
+          "Marlin": [
+            "marlin"
+          ]
+        }
+      }
     }
   ]
 }

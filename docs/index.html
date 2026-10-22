@@ -128,7 +128,7 @@ input[type=number]{width:84px;font-family:var(--f-mono)}
   <h2 class="resto-h" id="resto-h" hidden>El resto</h2>
   <div class="grid" id="grid"></div>
   <button class="more" id="more" hidden>Ver más</button>
-  <p class="nota">El precio final incluye envío a España. Si el vendedor está fuera de la UE se suman IVA (21 %), arancel si pasa de 150 € y unos 5 € de gestión de aduana: son estimaciones. El «precio habitual» es la mediana de los anuncios de esa marca (separando los de mujer) que el buscador ha visto en eBay. Un anuncio es CHOLLO si está al menos un 35 % por debajo de lo habitual y entre el 10 % más barato de su marca. En las subastas se exige un 50 % y que falten menos de 3 horas, porque antes el precio todavía sube.</p>
+  <p class="nota">El precio final incluye envío a España. Si el vendedor está fuera de la UE se suman IVA (21 %), arancel si pasa de 150 € y unos 5 € de gestión de aduana: son estimaciones. El «precio habitual» es la mediana de los anuncios «Cómpralo ya» que el buscador ha visto en eBay del mismo modelo o calibre (por ejemplo Raketa 2609) o, si no hay bastantes, de la misma marca. Son precios pedidos, no de venta. Un anuncio es CHOLLO si está al menos un 35 % por debajo de lo habitual y entre el 10 % más barato de su marca. En las subastas se exige un 50 % y que falten menos de 3 horas, porque antes el precio todavía sube.</p>
 </main>
 
 <script>
@@ -200,7 +200,7 @@ function card(x){
     ${imp}
     <span class="tot">Precio final</span><span class="tot">${eur(x.total)}</span>
    </div>
-   ${x.habitual?`<p class="vs">Habitual para ${esc(x.marca)}: ${eur(x.habitual)}${x.desc>0?` · <b>${x.desc} % más barato</b>`:""}</p>`:""}
+   ${x.habitual?`<p class="vs">Habitual para ${esc(x.ref_nombre||x.marca)}: ${eur(x.habitual)}${x.desc>0?` · <b>${x.desc} % más barato</b>`:""}</p>`:""}
    <div class="foot"><span class="time${h!=null&&h<=6&&x.formato==="Subasta"?" soon":""}">${tiempo(x)}</span><a class="btn" href="${esc(x.url)}" target="_blank" rel="noopener">Ver en eBay</a></div>
   </article>`;
 }
