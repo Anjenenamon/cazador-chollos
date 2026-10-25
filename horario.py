@@ -1,29 +1,52 @@
 #!/usr/bin/env python3
-"""Decide si esta ejecución programada toca, según la hora de España.
+"""Decide si toca buscar ahora, según la hora de España.
 
-GitHub solo entiende la hora UTC, así que el horario se programa dos veces
-(horario de invierno y de verano) y aquí se descarta la que no corresponde.
-Ejecuciones a mano (botón "Run workflow") siempre tocan.
+GitHub lanza este programa cada hora (y a veces con retraso o saltándose alguna).
+Aquí se mira cuál fue la última hora programada que ya ha pasado y si la última
+búsqueda es anterior a ella. Si lo es, falta una búsqueda y se hace ahora; así
+nunca se pierde ninguna. Las ejecuciones a mano (botón "Run workflow") siempre tocan.
+
+Horario: lunes a viernes 8:00 y 17:00; sábado y domingo 6, 10, 14, 18 y 22 h.
 """
+import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-INVIERNO = {"50 6,15 * * 1-5", "50 4,8,12,16,20 * * 0,6"}   # España = UTC+1
-VERANO = {"50 5,14 * * 1-5", "50 3,7,11,15,19 * * 0,6"}     # España = UTC+2
+MADRID = ZoneInfo("Europe/Madrid")
+ENTRE_SEMANA = [8, 17]
+FIN_DE_SEMANA = [6, 10, 14, 18, 22]
+MARGEN = timedelta(minutes=20)   # una búsqueda hecha hasta 20 min antes de la hora cuenta
 
-prog = os.environ.get("SCHEDULE", "").strip()
-desfase = datetime.now(ZoneInfo("Europe/Madrid")).utcoffset().total_seconds() / 3600
 
-if not prog:
-    toca = True
-elif prog in INVIERNO:
-    toca = desfase == 1
-elif prog in VERANO:
-    toca = desfase == 2
-else:
-    toca = True
+def ultima_programada(ahora):
+    for h in range(0, 24 * 8):
+        d = (ahora - timedelta(hours=h)).replace(minute=0, second=0, microsecond=0)
+        horas = FIN_DE_SEMANA if d.weekday() >= 5 else ENTRE_SEMANA
+        if d.hour in horas and d <= ahora:
+            return d
+    return None
 
-print(f"Programación: {prog or 'manual'} · España UTC+{desfase:g} · ¿toca? {'sí' if toca else 'no'}")
+
+def ultima_busqueda():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datos", "historial.json")
+    try:
+        with open(ruta, encoding="utf-8") as f:
+            s = json.load(f).get("ultima")
+        return datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(MADRID) if s else None
+    except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        return None
+
+
+ahora = datetime.now(MADRID)
+manual = os.environ.get("EVENTO", "") == "workflow_dispatch"
+tocaba = ultima_programada(ahora)
+ultima = ultima_busqueda()
+falta = tocaba is not None and (ultima is None or ultima < tocaba - MARGEN)
+toca = manual or falta
+
+print(f"Ahora: {ahora:%a %d/%m %H:%M} · Última programada: {tocaba:%a %d/%m %H:%M} · "
+      f"Última hecha: {ultima:%a %d/%m %H:%M}" if ultima else f"Ahora: {ahora:%a %d/%m %H:%M} · sin búsquedas previas")
+print("¿Toca buscar?", "sí (a mano)" if manual else ("sí, falta la de las %s" % f"{tocaba:%H:%M}" if falta else "no"))
 with open(os.environ.get("GITHUB_OUTPUT", os.devnull), "a", encoding="utf-8") as f:
     f.write(f"toca={'si' if toca else 'no'}\n")

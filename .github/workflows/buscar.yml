@@ -1,20 +1,20 @@
 name: Buscar chollos
 
 # Horario de España: lunes a viernes 8:00 y 17:00; sábado y domingo 6, 10, 14, 18 y 22 h.
-# GitHub usa hora UTC, por eso hay una línea para invierno y otra para verano (horario.py elige).
-# Se programan 10 minutos antes de la hora: a las horas en punto GitHub va saturado y retrasa.
+# GitHub retrasa o se salta a veces las ejecuciones programadas, así que se comprueba
+# cada hora (y además 10 min antes de cada hora de búsqueda) si falta alguna;
+# horario.py decide y solo busca cuando toca, sin repetir.
 on:
   schedule:
-    - cron: "50 6,15 * * 1-5"          # L-V invierno
-    - cron: "50 5,14 * * 1-5"          # L-V verano
-    - cron: "50 4,8,12,16,20 * * 0,6"  # finde invierno
-    - cron: "50 3,7,11,15,19 * * 0,6"  # finde verano
+    - cron: "23 * * * *"
+    - cron: "50 4,5,6,7,8,9,11,12,13,14,15,16,17,19,20,21 * * *"
   workflow_dispatch: {}
 
 permissions:
   contents: write
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: buscar
@@ -34,7 +34,7 @@ jobs:
         id: hora
         run: python3 horario.py
         env:
-          SCHEDULE: ${{ github.event.schedule }}
+          EVENTO: ${{ github.event_name }}
 
       - name: Buscar en eBay
         if: steps.hora.outputs.toca == 'si'
@@ -63,3 +63,18 @@ jobs:
       - id: publicar
         if: steps.hora.outputs.toca == 'si'
         uses: actions/deploy-pages@v4
+
+      - name: Avisar por correo
+        if: steps.hora.outputs.toca == 'si'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 aviso.py > aviso.md
+          num=$(gh issue list --label avisos --state open --json number --jq '.[0].number // empty')
+          if [ -z "$num" ]; then
+            gh label create avisos --color FBCA04 --description "Avisos del buscador" 2>/dev/null || true
+            gh issue create --title "Avisos del Cazador de Chollos" --label avisos \
+              --body "Aquí se apunta un resumen de cada búsqueda. GitHub te lo envía por correo."
+            num=$(gh issue list --label avisos --state open --json number --jq '.[0].number')
+          fi
+          gh issue comment "$num" --body-file aviso.md
