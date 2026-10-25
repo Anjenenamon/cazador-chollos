@@ -70,11 +70,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 aviso.py > aviso.md
-          num=$(gh issue list --label avisos --state open --json number --jq '.[0].number // empty')
+          num=$(gh api "repos/$GITHUB_REPOSITORY/issues?labels=avisos&state=open&per_page=1" --jq '.[0].number // empty')
           if [ -z "$num" ]; then
             gh label create avisos --color FBCA04 --description "Avisos del buscador" 2>/dev/null || true
-            gh issue create --title "Avisos del Cazador de Chollos" --label avisos \
-              --body "Aquí se apunta un resumen de cada búsqueda. GitHub te lo envía por correo."
-            num=$(gh issue list --label avisos --state open --json number --jq '.[0].number')
+            url=$(gh issue create --title "Avisos del Cazador de Chollos" --label avisos \
+              --body "Aquí se apunta un resumen de cada búsqueda. GitHub te lo envía por correo.")
+            num="${url##*/}"
           fi
           gh issue comment "$num" --body-file aviso.md
