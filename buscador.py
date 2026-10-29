@@ -194,7 +194,7 @@ def decada(t):
 
 
 def movimiento(t):
-    if re.search(r"automat|self.?wind|selbstaufzug", t):
+    if re.search(r"autom[aá]t|self.?wind|selbstaufzug|автомат|автоподзавод", t):
         return "Automático"
     if re.search(r"cuerda|hand.?wind|manual|handaufzug|remontage|carica manuale|manual wind", t):
         return "Cuerda manual"
