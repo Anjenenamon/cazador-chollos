@@ -263,6 +263,8 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
     mujer = bool(pats.get("mujer") and pats["mujer"].search(t))
     if mujer and b.get("solo_hombre"):
         return None
+    if pats.get("ninos") and pats["ninos"].search(t):
+        return None
     reparar = str(raw.get("conditionId", "")) == "7000" or bool(pats["reparar"] and pats["reparar"].search(t))
 
     m = RUBIES.search(t)
@@ -402,6 +404,7 @@ def main():
             "lote": patron(b.get("palabras_lote", [])),
             "mujer": patron(b.get("palabras_mujer", [])),
             "inicio": patron(b.get("excluir_si_empieza", [])),
+            "ninos": patron(b.get("palabras_ninos", [])),
             "marcas": [(n, patron(alias)) for n, alias in b.get("marcas", {}).items()],
             "modelos": {m: [(n, patron(a)) for n, a in mods.items()] for m, mods in b.get("modelos", {}).items()},
             "calibre": re.compile(b["calibre_regex"]) if b.get("calibre_regex") else None,

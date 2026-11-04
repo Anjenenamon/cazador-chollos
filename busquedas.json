@@ -414,6 +414,115 @@
         ],
         "Cauny": [
           "cauny"
+        ],
+        "HMT": [
+          "hmt",
+          "janata"
+        ],
+        "Allwyn": [
+          "allwyn"
+        ],
+        "Elgin": [
+          "elgin"
+        ],
+        "Waltham": [
+          "waltham"
+        ],
+        "Benrus": [
+          "benrus"
+        ],
+        "Gruen": [
+          "gruen"
+        ],
+        "Wittnauer": [
+          "wittnauer"
+        ],
+        "Anker": [
+          "anker"
+        ],
+        "Zentra": [
+          "zentra"
+        ],
+        "Bifora": [
+          "bifora"
+        ],
+        "PUW": [
+          "puw"
+        ],
+        "Arctos": [
+          "arctos"
+        ],
+        "Stowa": [
+          "stowa"
+        ],
+        "Laco": [
+          "laco"
+        ],
+        "Favre-Leuba": [
+          "favre-leuba",
+          "favre leuba"
+        ],
+        "West End": [
+          "west end watch",
+          "west end"
+        ],
+        "Revue Thommen": [
+          "revue thommen",
+          "revue"
+        ],
+        "Baume & Mercier": [
+          "baume & mercier",
+          "baume mercier",
+          "baume et mercier"
+        ],
+        "Jaeger-LeCoultre": [
+          "jaeger-lecoultre",
+          "jaeger lecoultre",
+          "lecoultre",
+          "le coultre"
+        ],
+        "IWC": [
+          "iwc"
+        ],
+        "Yema": [
+          "yema"
+        ],
+        "Herma": [
+          "herma"
+        ],
+        "Dodane": [
+          "dodane"
+        ],
+        "Zaria": [
+          "zaria",
+          "zarja",
+          "заря"
+        ],
+        "Zvezda": [
+          "zvezda",
+          "звезда"
+        ],
+        "Mayak": [
+          "mayak",
+          "маяк"
+        ],
+        "Volna": [
+          "volna",
+          "волна"
+        ],
+        "Start": [
+          "старт",
+          "start ussr",
+          "start cccp",
+          "start 1mchz"
+        ],
+        "Seagull": [
+          "seagull",
+          "sea-gull",
+          "sea gull"
+        ],
+        "Shanghai": [
+          "shanghai"
         ]
       },
       "erratas": {
@@ -722,7 +831,40 @@
             "marlin"
           ]
         }
-      }
+      },
+      "palabras_ninos": [
+        "niño",
+        "niños",
+        "niña",
+        "infantil",
+        "para niños",
+        "kids",
+        "kid's",
+        "child",
+        "children",
+        "childrens",
+        "children's",
+        "boy's",
+        "boys",
+        "kinder",
+        "kinderuhr",
+        "kinderarmbanduhr",
+        "jungen",
+        "mädchen",
+        "enfant",
+        "enfants",
+        "garçon",
+        "bambino",
+        "bambini",
+        "bambina",
+        "ragazzo",
+        "dziecięcy",
+        "dla dzieci",
+        "детские",
+        "disney",
+        "mickey mouse",
+        "snoopy"
+      ]
     }
   ]
 }
