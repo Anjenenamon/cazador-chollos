@@ -211,7 +211,7 @@ function syncControles(){
   document.querySelectorAll(".seg").forEach(seg=>seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st[seg.dataset.f]))));
   document.getElementById("orden").value=st.orden;
   document.getElementById("max").value=st.max;
-  const marcas=[...new Set(actual.items.map(x=>x.marca))].sort((a,b)=>a.localeCompare(b,"es"));
+  const marcas=[...new Set(actual.items.map(x=>x.marca))].sort((a,b)=>(a==="Otras")-(b==="Otras")||a.localeCompare(b,"es"));
   const sel=document.getElementById("marca");
   sel.innerHTML=`<option value="todas">Todas</option>`+marcas.map(m=>`<option>${esc(m)}</option>`).join("");
   sel.value=marcas.includes(st.marca)?st.marca:"todas";
