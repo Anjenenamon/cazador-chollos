@@ -208,6 +208,11 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
         return None
     if pats.get("inicio") and pats["inicio"].match(titulo.lower().strip()):
         return None
+    # Si eBay lo tiene en otra categoría (piezas, correas, cajas...), fuera
+    validas = set(b.get("categorias_validas") or [])
+    cats = {str(cat.get("categoryId")) for cat in (raw.get("categories") or [])}
+    if validas and cats and not (cats & validas):
+        return None
     # Habla de una pieza (esfera, correa, caja...) pero no dice que sea un reloj: es un repuesto
     if pats.get("pieza") and pats["pieza"].search(t) and not (pats.get("reloj") and pats["reloj"].search(t)):
         return None

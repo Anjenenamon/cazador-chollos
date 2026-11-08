@@ -29,6 +29,9 @@
       "precio_max": 200,
       "solo_hombre": true,
       "categoria": "31387",
+      "categorias_validas": [
+        "31387"
+      ],
       "arancel": 0.045,
       "consultas": [
         "reloj cuerda manual vintage",
@@ -325,7 +328,27 @@
         "uhr dial",
         "dial dial",
         "lagerbox",
-        "laufrad"
+        "laufrad",
+        "watch mechanism",
+        "watch mechanisms",
+        "mechanismen",
+        "meccanismi",
+        "ricambi",
+        "ricambio orologio",
+        "uhrenstand",
+        "schaufenster",
+        "schaufensterdisplay",
+        "display stand",
+        "expositor",
+        "présentoir",
+        "zapięcie",
+        "klamra",
+        "pasek do zegarka",
+        "kettenuhr",
+        "chain watch",
+        "reloj de cadena",
+        "montre gousset",
+        "gousset"
       ],
       "marcas": {
         "Poljot": [
