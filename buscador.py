@@ -208,6 +208,9 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
         return None
     if pats.get("inicio") and pats["inicio"].match(titulo.lower().strip()):
         return None
+    # Habla de una pieza (esfera, correa, caja...) pero no dice que sea un reloj: es un repuesto
+    if pats.get("pieza") and pats["pieza"].search(t) and not (pats.get("reloj") and pats["reloj"].search(t)):
+        return None
 
     opciones = raw.get("buyingOptions", [])
     subasta = "AUCTION" in opciones
@@ -302,6 +305,8 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
         "estado": "Para reparar" if reparar else "Funciona",
         "decada": decada(t),
         "movimiento": movimiento(t),
+        "cats": [str(cat.get("categoryId")) for cat in (raw.get("categories") or [])][:3],
+        "cat": ((raw.get("categories") or [{}])[0]).get("categoryName", ""),
         "rubies": int(m.group(1)) if m and 7 <= int(m.group(1)) <= 41 else None,
     }
 
@@ -405,6 +410,8 @@ def main():
             "mujer": patron(b.get("palabras_mujer", [])),
             "inicio": patron(b.get("excluir_si_empieza", [])),
             "ninos": patron(b.get("palabras_ninos", [])),
+            "pieza": patron(b.get("palabras_pieza", [])),
+            "reloj": patron(b.get("palabras_reloj", [])),
             "marcas": [(n, patron(alias)) for n, alias in b.get("marcas", {}).items()],
             "modelos": {m: [(n, patron(a)) for n, a in mods.items()] for m, mods in b.get("modelos", {}).items()},
             "calibre": re.compile(b["calibre_regex"]) if b.get("calibre_regex") else None,
