@@ -52,6 +52,7 @@ UMBRAL_CHOLLO = 35          # % por debajo del habitual (Cómpralo ya)
 UMBRAL_SUBASTA = 50         # subastas: más exigente, porque aún pueden subir
 HORAS_SUBASTA = 3           # y solo si quedan pocas horas
 VERSION_REGLAS = 2          # súbelo si cambian las reglas de qué cuenta como reloj
+DEMASIADO_BARATO = 80       # % por debajo de lo habitual a partir del cual se exige que diga "reloj"
 MIN_REFERENCIAS = 8         # anuncios mínimos para calcular el precio habitual
 PERCENTIL_CHOLLO = 10       # además debe estar entre el 10 % más barato de su marca
 MARGEN_SALIDA = 1.25        # en la página se guardan anuncios hasta 1,25 × el precio máximo
@@ -213,6 +214,11 @@ def analizar(raw, mercado, b, pats, tasas, cfg):
     cats = {str(cat.get("categoryId")) for cat in (raw.get("categories") or [])}
     if validas and cats and not (cats & validas):
         return None
+    # Palabras claras de pieza suelta (sin contar "para piezas o reparar", que son relojes enteros)
+    if pats.get("pieza_fuerte"):
+        t_sin_reparar = pats["reparar"].sub(" ", t) if pats.get("reparar") else t
+        if pats["pieza_fuerte"].search(t_sin_reparar):
+            return None
     # Habla de una pieza (esfera, correa, caja...) pero no dice que sea un reloj: es un repuesto
     if pats.get("pieza") and pats["pieza"].search(t) and not (pats.get("reloj") and pats["reloj"].search(t)):
         return None
@@ -416,6 +422,7 @@ def main():
             "inicio": patron(b.get("excluir_si_empieza", [])),
             "ninos": patron(b.get("palabras_ninos", [])),
             "pieza": patron(b.get("palabras_pieza", [])),
+            "pieza_fuerte": patron(b.get("palabras_pieza_fuerte", [])),
             "reloj": patron(b.get("palabras_reloj", [])),
             "marcas": [(n, patron(alias)) for n, alias in b.get("marcas", {}).items()],
             "modelos": {m: [(n, patron(a)) for n, a in mods.items()] for m, mods in b.get("modelos", {}).items()},
@@ -491,7 +498,11 @@ def main():
                 km = clave_ref(it["marca"], it["mujer"], it["modelo"]) if it["modelo"] else None
                 con_modelo = km in habitual
                 k = km if con_modelo else clave_ref(it["marca"], it["mujer"])
-                lista.append(evaluar(it, habitual.get(k), ref, barato.get(k), nombre_ref(it, con_modelo)))
+                ev = evaluar(it, habitual.get(k), ref, barato.get(k), nombre_ref(it, con_modelo))
+                # Demasiado barato para ser verdad y el título no dice que sea un reloj: es una pieza
+                if (ev["desc"] or 0) >= DEMASIADO_BARATO and not (pats.get("reloj") and pats["reloj"].search(" " + ev["titulo"].lower() + " ")):
+                    continue
+                lista.append(ev)
         lista.sort(key=lambda x: (not x["chollo"], -(x["desc"] or -999)))
         salida["busquedas"].append({
             "id": b["id"], "nombre": b["nombre"], "precio_max": b["precio_max"],
