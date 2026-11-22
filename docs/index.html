@@ -101,6 +101,8 @@ input[type=number]{width:84px;font-family:var(--f-mono)}
 </header>
 
 <div class="bar"><div class="wrap">
+  <div class="grp"><span class="lbl">Desde</span>
+    <div class="seg" data-f="origen"><button data-v="todos">Todo</button><button data-v="es">España</button><button data-v="eu">Europa</button><button data-v="resto">Resto del mundo</button></div></div>
   <div class="grp"><span class="lbl">Estado</span>
     <div class="seg" data-f="estado"><button data-v="todos">Todos</button><button data-v="Funciona">Funcionan</button><button data-v="Para reparar">Para reparar</button></div></div>
   <div class="grp"><span class="lbl">Movimiento</span>
@@ -139,7 +141,7 @@ const eur=n=>n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDi
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtFecha=d=>d.toLocaleString("es-ES",{timeZone:TZ,weekday:"long",day:"numeric",hour:"2-digit",minute:"2-digit"});
 let DATA=null, actual=null, mostrar=60;
-const defecto={estado:"todos",mov:"todos",formato:"todos",genero:"todos",marca:"todas",orden:"chollo",max:null};
+const defecto={origen:"todos",estado:"todos",mov:"todos",formato:"todos",genero:"todos",marca:"todas",orden:"chollo",max:null};
 let st={...defecto};
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
@@ -168,6 +170,10 @@ function proxima(){
   }
 }
 
+// Zona de envío según el país del vendedor. "Europa" = resto de Europa sin España
+// (incluye Reino Unido, Suiza o Ucrania, que pagan aduana: lo indica la ficha).
+const EUROPA=new Set("AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI SE GB CH NO IS LI MC SM AD VA UA MD RS BA MK AL ME XK GI".split(" "));
+function zona(p){return p==="ES"?"es":EUROPA.has(p)?"eu":"resto";}
 function horasHasta(iso){return iso?(new Date(iso)-Date.now())/36e5:null}
 function tiempo(it){
   if(it.formato!=="Subasta"){const h=horasHasta(it.fin);return h&&h<48?`Termina en ${Math.max(1,Math.round(h))} h`:"Cómpralo ya";}
@@ -228,6 +234,7 @@ function render(){
     &&(st.formato==="todos"||(st.formato==="ofertas"?x.ofertas:x.formato===st.formato))
     &&(st.marca==="todas"||x.marca===st.marca)
     &&(st.mov==="todos"||x.movimiento===st.mov)
+    &&(st.origen==="todos"||zona(x.pais)===st.origen)
     &&(st.genero==="todos"||(st.genero==="mujer")===!!x.mujer));
   const S={
     chollo:(a,b)=>(b.chollo-a.chollo)||(b.motivos.length-a.motivos.length)||((b.desc??-999)-(a.desc??-999)),
